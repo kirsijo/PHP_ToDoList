@@ -1,14 +1,14 @@
 <?php 
 
-$dbname = "ToDo";
-$host = 'db';
- // Database user name
- $dbuser = 'root';
- //database user password
- $dbpass = 'lionPass';
- $error = "";
+//Get Heroku ClearDB connection information
+$cleardb_url = parse_url(getenv("CLEARDB_DATABASE_URL"));
+$cleardb_server = $cleardb_url["host"];
+$cleardb_username = $cleardb_url["user"];
+$cleardb_password = $cleardb_url["pass"];
+$cleardb_db = substr($cleardb_url["path"],1);
 
-$conn = new mysqli($host, $dbuser, $dbpass, $dbname);
+// Connect to DB
+$conn = mysqli_connect($cleardb_server, $cleardb_username, $cleardb_password, $cleardb_db);
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 } else {
@@ -21,22 +21,22 @@ if ($conn->connect_error) {
 if (isset($_POST['submit'])) {
     $task = $_POST['task'];
     if ($task) {
-        mysqli_query($conn,"INSERT INTO Tasks (task) VALUES ('$task')");
+        mysqli_query($conn,"INSERT INTO tasks (task) VALUES ('$task')");
     } else {
         $error = "Please fill in a task";
     }    
 }
 
 // Deleting tasks 
-if (isset($_GET['deletetask'])) {
-    $id = $_GET['deletetask']; 
-    mysqli_query($conn, "DELETE FROM Tasks WHERE id='$id'");
+if (isset($_POST['deletetask'])) {
+    $id = $_POST['deletetask']; 
+    mysqli_query($conn, "DELETE FROM tasks WHERE id='$id'");
 }
 
 // Updating tasks to done 
-if (isset($_GET['updatedtask'])) {
-    $id = $_GET['updatedtask'];
-    mysqli_query($conn, "UPDATE Tasks SET done=true WHERE id='$id'");
+if (isset($_POST['updatedtask'])) {
+    $id = $_POST['updatedtask'];
+    mysqli_query($conn, "UPDATE tasks SET done=true WHERE id='$id'");
 }
 
 
@@ -75,7 +75,7 @@ if (isset($_GET['updatedtask'])) {
           <th>Done</th>
       </tr>
       <tbody>
- <?php $tasklist = mysqli_query($conn, "SELECT * FROM Tasks");
+ <?php $tasklist = mysqli_query($conn, "SELECT * FROM tasks");
 while ($row = mysqli_fetch_assoc($tasklist)) {
     //Setting conditional classes to tasks that are done/to-do
     if ($row['done']) { ?>
@@ -87,12 +87,20 @@ while ($row = mysqli_fetch_assoc($tasklist)) {
 <td class="task"> 
 <?php echo $row['task']; ?>
     </td>
-<td class="delete"><a href="index.php?deletetask=<?php echo $row['id'] ?>">X</a></td> 
-        
-<td class="checked"><a href="index.php?updatedtask=<?php
-echo $row['id'] ?>"><span class="material-icons">
-done
-</span></a>
+<td class="delete">
+    <form action="index.php" method="post">
+        <button type="submit" name="deletetask" value="<?php echo $row['id']?>" >
+        <span class="material-icons">delete</span>
+        </button>
+    </form>
+</td> 
+
+<td class="checked">
+<form action="index.php" method="post">
+        <button type="submit" name="updatedtask" value="<?php echo $row['id']?>" >
+        <span class="material-icons">done</span>
+        </button>
+</form>
 
 </td>
 </tr>
