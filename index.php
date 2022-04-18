@@ -16,7 +16,6 @@ if ($conn->connect_error) {
   //"Welcome to your todo app!";
 }
 
-
 //Inserting values to database
 if (isset($_POST['submit'])) {
     $task = $_POST['task'];
@@ -37,11 +36,7 @@ if (isset($_POST['deletetask'])) {
 if (isset($_POST['updatedtask'])) {
     $id = $_POST['updatedtask'];
     mysqli_query($conn, "UPDATE tasks SET done=true WHERE id='$id'");
-}
-
-
-
-?>
+}?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -77,7 +72,7 @@ if (isset($_POST['updatedtask'])) {
       <tbody>
  <?php $tasklist = mysqli_query($conn, "SELECT * FROM tasks");
 while ($row = mysqli_fetch_assoc($tasklist)) {
-    //Setting conditional classes to tasks that are done/to-do
+    //Setting conditional css classes to tasks that are done/to-do
     if ($row['done']) { ?>
      <tr class="item-done">
         <?php } else { ?>
