@@ -21,6 +21,8 @@ if (isset($_POST['submit'])) {
     $task = $_POST['task'];
     if ($task) {
         mysqli_query($conn,"INSERT INTO tasks (task) VALUES ('$task')");
+        header( "Location: {$_SERVER['REQUEST_URI']}", true, 303 );
+        exit();
     } else {
         $error = "Please fill in a task";
     }    
