@@ -16,11 +16,19 @@ if ($conn->connect_error) {
   //"Welcome to your todo app!";
 }
 
+function test_inputs($data){
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
+
 //Inserting values to database
 if (isset($_POST['submit'])) {
-    $task = $_POST['task'];
+    $task = test_inputs($_POST['task']);
     if ($task) {
         mysqli_query($conn,"INSERT INTO tasks (task) VALUES ('$task')");
+        //line below is to prevent resubmission upon 
         header( "Location: {$_SERVER['REQUEST_URI']}", true, 303 );
         exit();
     } else {
